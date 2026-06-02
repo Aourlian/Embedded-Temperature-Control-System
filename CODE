@@ -1,0 +1,118 @@
+#include <LiquidCrystal.h>
+#include <dht.h>
+
+dht DHT;
+
+#define DHT11_PIN A0
+#define FAN_PIN 4
+#define LED_PIN 2
+#define JOY_Y A1
+#define JOY_SW 6
+
+int celsius = 0;
+int fahrenheit = 0;
+int targetTemp = 75;
+
+bool updateDisplayFlag = true; 
+
+LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+
+void setup() {
+  pinMode(FAN_PIN, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(JOY_SW, INPUT_PULLUP);
+
+  Serial.begin(9600);
+
+  lcd.begin(16, 2);
+  lcd.clear();
+}
+
+void loop() {
+  updateTargetTemp();
+  checkTemp();
+  cooldown();
+  
+  if (updateDisplayFlag) {
+    updateDisplay();
+    updateDisplayFlag = false; // Reset flag until next change
+  }
+
+  delay(200); // Reduced delay for better joystick responsiveness
+}
+
+void updateDisplay() {
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Temp:   ");
+  lcd.print(fahrenheit);
+  lcd.print("F");
+
+  lcd.setCursor(0, 1);
+  lcd.print("Target: ");
+  lcd.print(targetTemp);
+  lcd.print("F");
+}
+
+void updateTargetTemp() {
+  int yValue = analogRead(JOY_Y);
+  int oldTarget = targetTemp;
+
+  if (yValue > 800) {
+    targetTemp++;
+    delay(150); 
+  }
+  else if (yValue < 200) {
+    targetTemp--;
+    delay(150); 
+  }
+
+  if (digitalRead(JOY_SW) == LOW) {
+    targetTemp = 75;
+    delay(200); 
+  }
+
+
+  if (targetTemp < 50) targetTemp = 50;
+  if (targetTemp > 100) targetTemp = 100;
+
+    if (targetTemp != oldTarget) {
+    updateDisplayFlag = true;
+  }
+}
+
+void checkTemp() {
+  if (millis() - lastDHTRead > 2000) {
+    int chk = DHT.read11(DHT11_PIN);
+    
+       if (chk == DHTLIB_OK) {
+      int oldFahr = fahrenheit;
+      celsius = DHT.temperature;
+      fahrenheit = (celsius * 1.8) + 32;
+
+    
+      if (fahrenheit != oldFahr) {
+        updateDisplayFlag = true;
+      }
+    }
+    lastDHTRead = millis();
+  }
+
+  // Serial debug printout
+  Serial.print("Current Temp: ");
+  Serial.print(fahrenheit);
+  Serial.print("F  Target: ");
+  Serial.print(targetTemp);
+  Serial.println("F");
+}
+
+void cooldown() {
+  if (fahrenheit > targetTemp) {
+    digitalWrite(FAN_PIN, HIGH);
+    digitalWrite(LED_PIN, HIGH);
+  }
+  else {
+    digitalWrite(FAN_PIN, LOW);
+    digitalWrite(LED_PIN, LOW);
+  }
+}
