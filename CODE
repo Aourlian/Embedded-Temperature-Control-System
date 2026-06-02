@@ -13,6 +13,7 @@ int celsius = 0;
 int fahrenheit = 0;
 int targetTemp = 75;
 
+unsigned long lastDHTRead = 0;
 bool updateDisplayFlag = true; 
 
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
