@@ -1,4 +1,4 @@
-<br>For LCD-https://docs.arduino.cc/learn/electronics/lcd-displays/
+For LCD-https://docs.arduino.cc/learn/electronics/lcd-displays/
 <br>For DHT11 Basics-https://projecthub.arduino.cc/onatto22/dht11-humidity-temperature-sensor-with-16x2-lcd-display-7bf46c
 <br>For the joystick-https://projecthub.arduino.cc/hibit/using-joystick-module-with-arduino-0ffdd4
 
