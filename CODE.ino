@@ -36,10 +36,10 @@ void loop() {
   
   if (updateDisplayFlag) {
     updateDisplay();
-    updateDisplayFlag = false; // Reset flag until next change
+    updateDisplayFlag = false; 
   }
 
-  delay(200); // Reduced delay for better joystick responsiveness
+  delay(200); 
 }
 
 void updateDisplay() {
